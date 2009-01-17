@@ -1,5 +1,4 @@
-CalendarFor
-===========
+= CalendarFor
 
 The calendar_for helper method generates standard calendars, in the form of HTML tables. Each day of the calendars being 
 output is a TD element; the content template for each cell is the block being passed to the helper; partials are the 
