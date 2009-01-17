@@ -1,7 +1,93 @@
-calendar_for
-============
+CalendarFor
+===========
 
-Description goes here.
+The calendar_for helper method generates standard calendars, in the form of HTML tables. Each day of the calendars being 
+output is a TD element; the content template for each cell is the block being passed to the helper; partials are the 
+easiest to deal with. Each yielded template is given access to a Time object for midnight on the day it's rendering.
+
+All cells are created with a valid Time object. i.e. if you're making a calendar for Oct. 2008, the first day is a 
+Wednesday. Any cells that come before that in the table (e.g. Sunday, Monday, Tuesday) will use the end of September to 
+render the template. If you need those cells to be empty, they are classed in the HTML and you should just knock them 
+out with styles.
+
+Usage
+===========
+
+The most basic implementation of the helper makes a calendar for all of the current month.
+
+  <%= calendar_for { |day| content_tag(:h3, day.mday } %>
+  
+This will generate a table with its first row being a TR element for each weekday's full name (e.g. Sunday, 
+Monday...Saturday), and then rows for each week of the month, where each cell contains an H3 element with the day of the 
+month (1,2...31).
+
+Options
+===========
+
+The first argument is the date to be considered. It can be a Time or Date, a Chronic-parsable string, or a hash ({ :year 
+=> 2009 [, :month => 1 [, :day => 15]] })
+
+Other options include:
+:week_start      is the day of the week the calendars should start on, default is Sunday.
+          accepts 0 – 6 (Sunday – Saturday), or a String or Symbol of the weekday name ("Sunday", :monday)
+:timeframe      is the scope of the calendars being produces. Default is :month
+          :day creates a single cell table for the supplied date
+          :week
+          :month
+          :quarter creates three tables for the months of the quarter the date is in (e.g if supplied date is Feb 2, 
+          shows Jan. Feb, Mar)
+          :year goes back to January of the year for the supplied date and shows all months
+          Integer starts with the month of the supplied date and shows the next i-1 months
+:weekday_headers  false suppressed the row of TRs containing the weekday names
+          Array (length = 7) replaces the default weekday names (always starts with Sunday)
+:html_classes    replaces the default html class names for special cells (today, days outside the month being shown that 
+appear on the calendar)
+          :today
+          :out_of_timeframe
+
+Examples
+===========
+
+  Example 1
+
+  <%= calendar_for(  { :year => 2010, :month => 5 }, 
+            :week_start => :monday, 
+            :timeframe => :quarter, 
+            :weekday_headers => ['S','M','T','W','T','F','S']
+            :html_classes => { :out_of_timeframe => 'blank' }
+          ) { |day| render :partial => 'day', :locals => { :day => day } } %>
+          
+  # _day.html.erb
+  
+  <%= content_tag(:h5, link_to(day.mday, { :controller => 'calendar', :action => 'show', :year => day.year, :month => 
+  day.month, :day => day.mday })
+
+
+  Example 2
+  
+  <%= calendar_for(Time.now, :weekday_start => :monday, :timeframe => :week) { render :partial => 'day', :locals => { 
+  :day => day } }
+  
+  # _day.html.erb
+  
+  <%= link_to(day.mday) %>
+  <ol><%= render :partial => 'event', :collection => @events.select { |e| e.starts_at.midnight == day.midnight } %></ol>
+
+    
+  # _event.html.erb
+  <%= content_tag(:li, event.summary) %>
+  
+Sample output
+===========
+  
+  # for <%= calendar_for({ :year => 2008, :month => 10 }, :week_start => :monday, :timeframe => :week) { |day| 
+  content_tag(:p, day.mday) } %>
+  
+  <table 
+  class="calendar"><tr><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th
+  ><th>Sunday</th></tr><tr><td class="null"><p>29</p></td><td 
+  class="today"><p>30</p></td><td><p>1</p></td><td><p>2</p></td><td><p>3</p></td><td><p>4</p></td><td><p>5</p></td></tr>
+  </table>
 
 COPYRIGHT
 =========
