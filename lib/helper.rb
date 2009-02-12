@@ -83,12 +83,20 @@ module CalendarHelper
     table.push(rows)
   end
   
+  def build_months(options)
+    options[:view_parameters][:months].times do |m|
+      buid
+    end    
+  end
+  
   def build_table_headers(options)
     tr = Markup::Element.new(:table)
     options[:weekday_names].each { |name| Markup::Element.new(:th) { name }.inject_into(tr) }
   end
 
   def build_table_rows(options)
-    
+    options[:view_parameters][:months].times do |m|
+      
+    end
   end
 end

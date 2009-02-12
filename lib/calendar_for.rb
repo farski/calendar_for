@@ -86,7 +86,11 @@ module CalendarHelper
           elsif current_date.month != timeframe_starts_on.month
             html_class = options[:html_classes][:out_of_timeframe]
           end
-          table_cells << content_tag(:td, yield(current_date), :class => html_class)
+          if options[:explicit_cells]
+            table_cells << yield(current_date)
+          else
+            table_cells << content_tag(:td, yield(current_date), :class => html_class)
+          end
         end
         table_rows << content_tag(:tr, table_cells.join)
       end
